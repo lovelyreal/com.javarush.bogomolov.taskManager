@@ -1,32 +1,60 @@
 package com.javarush.bogomolov.taskmanager.controller;
 
-
-import com.javarush.bogomolov.taskmanager.repository.JobRepository;
+import com.javarush.bogomolov.taskmanager.dto.JobDto;
 import com.javarush.bogomolov.taskmanager.repository.entity.Job;
 import com.javarush.bogomolov.taskmanager.service.JobService;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
 @RequestMapping("/api")
 public class JobStatusController {
 
-    private JobService jobService;
+    private final JobService jobService;
 
-    @PostMapping("/job/create")
+    public JobStatusController(JobService jobService) {
+        this.jobService = jobService;
+    }
+
+    @PostMapping(value = "/job/create", consumes = "application/json")
     public UUID createJob(
-            @RequestBody Job job
+            @RequestBody @Validated Job job
     ) {
         return jobService.createJob(job).getId();
     }
 
-    @GetMapping
+    @GetMapping("/job/find")
     public Job getJob(
-           @RequestParam("UUID") UUID jobId
+            @RequestParam("UUID") UUID jobId
     ) {
         return jobService.getJobById(jobId);
     }
 
+    @GetMapping("/job")
+    public List<Job> getAllUserJobs(
+            @RequestParam("UUID") UUID userId,
+            @RequestParam("showDeadJobs") boolean showDeadJobs
+    ) {
+        return jobService.getAllJobs(userId, showDeadJobs);
+    }
+
+    @PostMapping("/job/edit")
+    public Job editJobById(
+            @RequestBody JobDto jobDto
+    ) {
+        return jobService.editJob(jobDto);
+    }
+
+    @DeleteMapping("/job/delete")
+    public ResponseEntity<Void> deleteJob
+            (
+                    @RequestParam UUID jobId
+            ) {
+        return jobService.deleteJob(jobId);
+    }
 
 }

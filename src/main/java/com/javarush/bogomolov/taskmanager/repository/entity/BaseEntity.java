@@ -1,12 +1,11 @@
 package com.javarush.bogomolov.taskmanager.repository.entity;
 
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Id;
-import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.*;
 import lombok.*;
 
-import java.security.Timestamp;
+
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @MappedSuperclass
@@ -17,13 +16,14 @@ import java.util.UUID;
 public class BaseEntity {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @Column
-    private Timestamp createdAt;
+    private LocalDateTime createdAt;
 
     @Column
-    private Timestamp changedAt;
+    private LocalDateTime changedAt;
 
 
 

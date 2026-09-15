@@ -1,11 +1,14 @@
 package com.javarush.bogomolov.taskmanager.service;
 
+import com.javarush.bogomolov.taskmanager.dto.JobDto;
 import com.javarush.bogomolov.taskmanager.repository.JobRepository;
 import com.javarush.bogomolov.taskmanager.repository.entity.Job;
-import jakarta.persistence.EntityNotFoundException;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 
@@ -30,5 +33,25 @@ public class JobService {
 
     }
 
+    public List<Job> getAllJobs(UUID userId, boolean showDeadJobs){
+        return jobRepository.findJobsByOwnerIdAndDeadlineStatus(userId, showDeadJobs, LocalDateTime.now());
+    }
+
+
+    public Job editJob(JobDto jobDto){
+        Job jobToEdit = jobRepository.findJobById(jobDto.getJobId());
+
+        jobToEdit.setDeadline(jobDto.getDeadline() != null ? jobDto.getDeadline() : jobToEdit.getDeadline());
+        jobToEdit.setJobInformation(jobDto.getJobInformation() != null ? jobDto.getJobInformation() : jobToEdit.getJobInformation());
+        jobToEdit.setJobStatus(jobDto.getJobStatus() != null ? jobDto.getJobStatus() : jobToEdit.getJobStatus());
+        jobToEdit.setName(jobDto.getJobName() != null ? jobDto.getJobName() : jobToEdit.getName());
+
+        return jobRepository.save(jobToEdit);
+    }
+
+        public ResponseEntity<Void> deleteJob(UUID jobId){
+            jobRepository.deleteById(jobId);
+            return ResponseEntity.ok().build();
+        }
 
 }

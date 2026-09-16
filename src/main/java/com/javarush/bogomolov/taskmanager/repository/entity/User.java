@@ -1,11 +1,19 @@
 package com.javarush.bogomolov.taskmanager.repository.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.List;
 
 @Entity
 @Table(name = "users")
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class User extends BaseEntity{
 
 
@@ -24,5 +32,6 @@ public class User extends BaseEntity{
 
     @OneToMany(mappedBy = "jobOwner", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Job> jobs;
+
 
 }

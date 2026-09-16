@@ -23,6 +23,8 @@ public class JobService {
     @Transactional
     public Job createJob(Job job){
         job.setId(UUID.randomUUID());
+        job.setCreatedAt(LocalDateTime.now());
+        job.setChangedAt(LocalDateTime.now());
         jobRepository.save(job);
         return job;
     }

@@ -11,30 +11,30 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api")
-public class JobStatusController {
+@RequestMapping("/api/job")
+public class JobController {
 
     private final JobService jobService;
 
-    public JobStatusController(JobService jobService) {
+    public JobController(JobService jobService) {
         this.jobService = jobService;
     }
 
-    @PostMapping(value = "/job/create", consumes = "application/json")
+    @PostMapping(value = "/create", consumes = "application/json")
     public UUID createJob(
             @RequestBody @Validated Job job
     ) {
         return jobService.createJob(job).getId();
     }
 
-    @GetMapping("/job/find")
+    @GetMapping("/find")
     public Job getJob(
             @RequestParam("UUID") UUID jobId
     ) {
         return jobService.getJobById(jobId);
     }
 
-    @GetMapping("/job")
+    @GetMapping("/get")
     public List<Job> getAllUserJobs(
             @RequestParam("UUID") UUID userId,
             @RequestParam("showDeadJobs") boolean showDeadJobs
@@ -42,14 +42,14 @@ public class JobStatusController {
         return jobService.getAllJobs(userId, showDeadJobs);
     }
 
-    @PostMapping("/job/edit")
+    @PostMapping("/edit")
     public Job editJobById(
             @RequestBody JobDto jobDto
     ) {
         return jobService.editJob(jobDto);
     }
 
-    @DeleteMapping("/job/delete")
+    @DeleteMapping("/delete")
     public ResponseEntity<Void> deleteJob
             (
                     @RequestParam UUID jobId

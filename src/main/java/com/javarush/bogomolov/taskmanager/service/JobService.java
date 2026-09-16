@@ -3,7 +3,10 @@ package com.javarush.bogomolov.taskmanager.service;
 import com.javarush.bogomolov.taskmanager.dto.JobDto;
 import com.javarush.bogomolov.taskmanager.repository.JobRepository;
 import com.javarush.bogomolov.taskmanager.repository.entity.Job;
+import com.javarush.bogomolov.taskmanager.repository.entity.User;
+import com.javarush.bogomolov.taskmanager.security.CustomUserDetails;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,26 +24,36 @@ public class JobService {
         this.jobRepository = jobRepository;
     }
     @Transactional
-    public Job createJob(Job job){
+    public Job createJob(
+            Job job,
+            Authentication authentication
+    ) {
+        CustomUserDetails userDetails =
+                (CustomUserDetails) authentication.getPrincipal();
+
+        User user = userDetails.getUser();
+
         job.setId(UUID.randomUUID());
         job.setCreatedAt(LocalDateTime.now());
         job.setChangedAt(LocalDateTime.now());
-        jobRepository.save(job);
-        return job;
+
+        job.setJobOwner(user);
+
+        return jobRepository.save(job);
     }
 
-    public Job getJobById(UUID id){
+    public Job getJobById(UUID id) {
 
         return jobRepository.findById(id).isPresent() ? jobRepository.findById(id).get() : null;
 
     }
 
-    public List<Job> getAllJobs(UUID userId, boolean showDeadJobs){
+    public List<Job> getAllJobs(UUID userId, boolean showDeadJobs) {
         return jobRepository.findJobsByOwnerIdAndDeadlineStatus(userId, showDeadJobs, LocalDateTime.now());
     }
 
-
-    public Job editJob(JobDto jobDto){
+    @Transactional
+    public Job editJob(JobDto jobDto) {
         Job jobToEdit = jobRepository.findJobById(jobDto.getJobId());
 
         jobToEdit.setDeadline(jobDto.getDeadline() != null ? jobDto.getDeadline() : jobToEdit.getDeadline());
@@ -51,9 +64,10 @@ public class JobService {
         return jobRepository.save(jobToEdit);
     }
 
-        public ResponseEntity<Void> deleteJob(UUID jobId){
-            jobRepository.deleteById(jobId);
-            return ResponseEntity.ok().build();
-        }
+    @Transactional
+    public ResponseEntity<Void> deleteJob(UUID jobId) {
+        jobRepository.deleteById(jobId);
+        return ResponseEntity.ok().build();
+    }
 
 }

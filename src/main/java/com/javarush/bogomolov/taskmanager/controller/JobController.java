@@ -4,6 +4,7 @@ import com.javarush.bogomolov.taskmanager.dto.JobDto;
 import com.javarush.bogomolov.taskmanager.repository.entity.Job;
 import com.javarush.bogomolov.taskmanager.service.JobService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,9 +23,10 @@ public class JobController {
 
     @PostMapping(value = "/create", consumes = "application/json")
     public UUID createJob(
-            @RequestBody @Validated Job job
+            @RequestBody @Validated Job job,
+            Authentication authentication
     ) {
-        return jobService.createJob(job).getId();
+        return jobService.createJob(job, authentication).getId();
     }
 
     @GetMapping("/find")

@@ -5,6 +5,7 @@ import com.javarush.bogomolov.taskmanager.exception.EntityNotFoundException;
 import com.javarush.bogomolov.taskmanager.repository.UserRepository;
 import com.javarush.bogomolov.taskmanager.repository.entity.User;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,14 +17,17 @@ import java.util.UUID;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Transactional
     public User createUser(User user) {
         user.setId(UUID.randomUUID());
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setCreatedAt(LocalDateTime.now());
         user.setChangedAt(LocalDateTime.now());
         return userRepository.save(user);
@@ -41,7 +45,7 @@ public class UserService {
         userById.setEmail(updateUser.getEmail() != null ? updateUser.getEmail() : userById.getEmail());
         userById.setJobs(updateUser.getJobs() != null ? updateUser.getJobs() : userById.getJobs());
         userById.setLogin(updateUser.getLogin() != null ? updateUser.getLogin() : userById.getLogin());
-        userById.setPassword(updateUser.getPassword() != null ? updateUser.getPassword() : userById.getPassword());
+        userById.setPassword(updateUser.getPassword() != null ? passwordEncoder.encode(updateUser.getPassword()) : userById.getPassword());
         userById.setChangedAt(LocalDateTime.now());
         return userRepository.save(userById);
 
